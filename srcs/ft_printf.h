@@ -14,7 +14,20 @@ struct					s_ptf
 	int width;
 	int type;
 	int space;
+	int hexa;
+	int prec;
+	char base[17];
+	char null[7];
 	va_list ap;
 };
 
+int		ft_strlen_prec(t_ptf *ptf, char *str);
+int		ft_strangelen(char *str);
+int		ft_putstr(char *str);
+int		ft_putstr_prec(t_ptf *ptf, char *str);
+int		parser_prec(t_ptf *ptf, const char *str);
+int		ft_abs(t_ptf *ptf, int n);
+int		ft_putchar(char c);
+void	hexsize(t_ptf *ptf, unsigned long int nb);
+void	hexbase(t_ptf *ptf, unsigned long int nb);
 #endif

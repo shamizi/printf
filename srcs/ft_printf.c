@@ -65,20 +65,77 @@ void	display_s(t_ptf *ptf)
 	int i;
 
 	str = (va_arg(ptf->ap, char *));
-	i = ft_strangelen(str);
-	ptf->width = ptf->width - i;
+	//i = ft_strangelen(str);
+	ptf->width -= ft_strlen_prec(ptf, str);
 	i = 0;
 	if (ptf->neg == 0)
 	{
 		while(i++ < ptf->width)
 			ptf->ret += ft_putchar(ptf->space);
 	}
-	ptf->ret += ft_putstr(str);
+
+
+	ft_putstr_prec(ptf, str);
+	//ptf->ret += ft_putstr(str);
+
+
+
 	if (ptf->neg == 1)
 	{
 		while (i++ < ptf->width)
 			ptf->ret += ft_putchar(' ');
 	}
+}
+
+void	display_p(t_ptf *ptf)
+{
+	unsigned long int p;
+	int i;
+
+	i = 0;
+	p = (unsigned long int)va_arg(ptf->ap, void *);
+	hexsize(ptf, p);
+	ptf->width = ptf->width - ptf->hexa - 2;
+	if (ptf->neg == 0)
+	{
+		while (i++ < ptf->width)
+			ptf->ret += ft_putchar(ptf->space);
+	}
+	ptf->ret += ft_putstr("0x");
+	if (!p)
+		ptf->ret += ft_putchar('0');
+	else
+		hexbase(ptf, p);
+	if (ptf->neg == 1)
+	{
+		while (i++ < ptf->width)
+			ft_putchar(' ');
+	}
+}
+
+void	display_x(t_ptf *ptf)
+{
+	unsigned long int x;
+	int i;
+
+	i = 0;
+	x = (unsigned long int)va_arg(ptf->ap, unsigned int);
+	hexsize(ptf, x);
+	ptf->width = ptf->width - ptf->hexa;
+	if (ptf->type == 'X')
+		ft_strlcpy(ptf->base, "0123456789ABCDEF", 17);
+	if(ptf->neg == 0)
+	{
+		while (i++ < ptf->width)
+			ptf->ret += ft_putchar(ptf->space);
+	}
+	hexbase(ptf, x);
+	if (ptf->neg == 1)
+	{
+		while (i++ < ptf->width)
+			ft_putchar(' ');
+	}
+	
 }
 
 void	display_type(t_ptf *ptf)
@@ -88,8 +145,10 @@ void	display_type(t_ptf *ptf)
 		display_c(ptf);
 	if (ptf->type == 's')
 		display_s(ptf);
-//	if (ptf->type = 'c')
-//	if (ptf->type = 'c')
+	if (ptf->type == 'p')
+		display_p(ptf);
+	if (ptf->type == 'x' || ptf->type == 'X') 
+		display_x(ptf);
 //	if (ptf->type = 'c')
 //	if (ptf->type = 'c')
 //	if (ptf->type = 'c')
@@ -114,6 +173,12 @@ int		flags(t_ptf *ptf, const char *str)
 		while (ft_isdigit(str[i]))
 			i++;
 	}
+	if (str[i] == '*')
+	{
+		ptf->width = ft_abs(ptf, va_arg(ptf->ap, int));
+		i++;
+	}
+	i += parser_prec(ptf, &str[i]);
 	ptf->type = str[i];
 	display_type(ptf);
 	return (++i);
@@ -127,6 +192,10 @@ void	initialize(t_ptf *ptf)
 	ptf->width = 0;
 	ptf->type = 0;
 	ptf->space = ' ';
+	ptf->hexa = 0;
+	ptf->prec = -1;
+	ft_strlcpy(ptf->base, "0123456789abcdef", 17);
+	ft_strlcpy(ptf->null, "(null)", 7);
 	// space = si flag 0 on mets des 0 a la place des espace pour le decalage
 }
 
@@ -158,11 +227,14 @@ int		ft_printf(const char *str, ...)
 int		main(void)
 {
 	char c;
-	char d;
-	char str[50] = "test";
+	int d;
+	char str[50] = "abcdef";
+	void	*p;
+	unsigned int x;
 
+	x = 123456789;
 	c = 's';
-	d = 'd';
-	printf("chiffre : %01s %05c\n", str, d);
-	ft_printf("chiffre : %01s %05c\n", str, d);
+	d = 12;
+	printf("chiffre : %.*x\n", 15, x);
+	ft_printf("chiffre : %.*x\n", 15, x);
 }
