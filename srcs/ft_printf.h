@@ -13,7 +13,7 @@ struct					s_ptf
 	int neg;
 	int width;
 	int type;
-	int space;
+	char space;
 	int hexa;
 	int prec;
 	char base[17];
@@ -30,4 +30,8 @@ int		ft_abs(t_ptf *ptf, int n);
 int		ft_putchar(char c);
 void	hexsize(t_ptf *ptf, unsigned long int nb);
 void	hexbase(t_ptf *ptf, unsigned long int nb);
+//char	*itohex(t_ptf *ptf, unsigned long int nb);
+char	*itohex(char *base, unsigned long int nb);
+int		hexalen(unsigned long int nb);
+void	ft_hexstr(t_ptf *ptf, char *str);
 #endif

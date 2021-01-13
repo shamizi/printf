@@ -115,13 +115,40 @@ void	display_p(t_ptf *ptf)
 
 void	display_x(t_ptf *ptf)
 {
+	int i;
+	unsigned long int x;
+	char *str;
+
+	if (ptf->type == 'X')
+		ft_strlcpy(ptf->base, "0123456789ABCDEF", 17);
+	i = 0;
+	x = (unsigned long int)va_arg(ptf->ap, unsigned int);
+	if(!(str = itohex(ptf->base, x)))
+			return ;
+	if (ptf->prec >= 0 && ptf->prec - hexalen(x) > 0)
+		ptf->prec = ptf->prec - hexalen(x);
+	ptf->width -= (hexalen(x) + ptf->prec);
+	if (ptf->neg == 0)
+	{
+		while (ptf->width-- > 0)
+			ptf->ret += ft_putchar(ptf->space);
+	}
+	ft_hexstr(ptf, str);
+	if(ptf->neg == 1)
+	{
+		while (ptf->width-- > 0)
+			ptf->ret += ft_putchar(' ');
+	}
+}
+/*void	display_x(t_ptf *ptf)
+{
 	unsigned long int x;
 	int i;
 
 	i = 0;
 	x = (unsigned long int)va_arg(ptf->ap, unsigned int);
 	hexsize(ptf, x);
-	ptf->width = ptf->width - ptf->hexa;
+	ptf->width -= ptf->hexa;
 	if (ptf->type == 'X')
 		ft_strlcpy(ptf->base, "0123456789ABCDEF", 17);
 	if(ptf->neg == 0)
@@ -137,7 +164,7 @@ void	display_x(t_ptf *ptf)
 	}
 	
 }
-
+*/
 void	display_type(t_ptf *ptf)
 {
 	
@@ -235,6 +262,6 @@ int		main(void)
 	x = 123456789;
 	c = 's';
 	d = 12;
-	printf("chiffre : %.*x\n", 15, x);
-	ft_printf("chiffre : %.*x\n", 15, x);
+	printf("chiffre : %50.*x\n",15, x);
+	ft_printf("chiffre : %50.*x\n",15,  x);
 }
