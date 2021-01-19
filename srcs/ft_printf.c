@@ -127,7 +127,10 @@ void	display_x(t_ptf *ptf)
 			return ;
 	if (ptf->prec >= 0 && ptf->prec - hexalen(x) > 0)
 		ptf->prec = ptf->prec - hexalen(x);
-	ptf->width -= (hexalen(x) + ptf->prec);
+	if (ptf->prec < 0)
+		ptf->width -= hexalen(x);
+	else
+		ptf->width -= (hexalen(x) + ptf->prec);
 	if (ptf->neg == 0)
 	{
 		while (ptf->width-- > 0)
@@ -140,31 +143,41 @@ void	display_x(t_ptf *ptf)
 			ptf->ret += ft_putchar(' ');
 	}
 }
-/*void	display_x(t_ptf *ptf)
-{
-	unsigned long int x;
-	int i;
 
-	i = 0;
-	x = (unsigned long int)va_arg(ptf->ap, unsigned int);
-	hexsize(ptf, x);
-	ptf->width -= ptf->hexa;
-	if (ptf->type == 'X')
-		ft_strlcpy(ptf->base, "0123456789ABCDEF", 17);
-	if(ptf->neg == 0)
+//si je doit qjouter des 0 le moins est avant les 0, sinon putnbr assez classique avec quelques conditions
+//ajouter une valeur pour determiner la position du moins dans ma structure ?
+//
+void	display_i(t_ptf *ptf)
+{
+	int nb;
+
+	nb = va_arg(ptf->ap, int);
+	if (nb < 0)
+		ptf->width--;
+	if (ptf->prec >= 0)
+		ptf->prec -= integerlen(nb);
+	if (ptf->prec < 0)
+		ptf->width -= integerlen(nb);
+	else
+		ptf->width -= (integerlen(nb) + ptf->prec);
+	//printf(" test valeur width : %d \n test valeur prec : %d \n integern len %d\n", ptf->width, ptf->prec, integerlen(nb));
+	if (ptf->neg == 0)
 	{
-		while (i++ < ptf->width)
+		if (nb < 0 && ptf->space == '0')
+			ptf->ret += ft_putchar('-');
+		while (ptf->width-- > 0)
 			ptf->ret += ft_putchar(ptf->space);
+		if (nb < 0 && ptf->space == ' ')
+			ptf->ret += ft_putchar('-');
 	}
-	hexbase(ptf, x);
-	if (ptf->neg == 1)
+	ft_nbstr(ptf, nb);
+	if(ptf->neg == 1)
 	{
-		while (i++ < ptf->width)
-			ft_putchar(' ');
+		while (ptf->width-- > 0)
+			ptf->ret += ft_putchar(' ');
 	}
-	
 }
-*/
+
 void	display_type(t_ptf *ptf)
 {
 	
@@ -176,9 +189,10 @@ void	display_type(t_ptf *ptf)
 		display_p(ptf);
 	if (ptf->type == 'x' || ptf->type == 'X') 
 		display_x(ptf);
-//	if (ptf->type = 'c')
-//	if (ptf->type = 'c')
-//	if (ptf->type = 'c')
+	if (ptf->type == 'i' || ptf->type == 'd')
+		display_i(ptf);
+	if (ptf->type == 'u')
+		display_u(ptf);
 }
 
 int		flags(t_ptf *ptf, const char *str)
@@ -221,6 +235,7 @@ void	initialize(t_ptf *ptf)
 	ptf->space = ' ';
 	ptf->hexa = 0;
 	ptf->prec = -1;
+	ptf->nbneg = 0;
 	ft_strlcpy(ptf->base, "0123456789abcdef", 17);
 	ft_strlcpy(ptf->null, "(null)", 7);
 	// space = si flag 0 on mets des 0 a la place des espace pour le decalage
@@ -232,7 +247,7 @@ int		ft_printf(const char *str, ...)
 	int i;
 	t_ptf *ptf;
 
-	ptf = malloc(sizeof(ptf));
+	ptf = malloc(sizeof(*ptf));
 	initialize(ptf);
 	va_start(ptf->ap, str);
 	i = 0;
@@ -254,14 +269,18 @@ int		ft_printf(const char *str, ...)
 int		main(void)
 {
 	char c;
-	int d;
+	unsigned int d;
 	char str[50] = "abcdef";
 	void	*p;
 	unsigned int x;
 
+	int star = 12;
+	int star2 = 3;
+
+
 	x = 123456789;
 	c = 's';
-	d = 12;
-	printf("chiffre : %50.*x\n",15, x);
-	ft_printf("chiffre : %50.*x\n",15,  x);
+	d = 50;
+	printf("original : %*.*u\n", 12, 3, d);
+	ft_printf("chiffres : %*.*u\n", 12, 3, d);
 }
