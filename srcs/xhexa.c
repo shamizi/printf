@@ -4,12 +4,9 @@ int		hexalen(unsigned long int nb)
 {
 	int i;
 
-	i = 0;
-	while (nb)
-	{
-		nb /= 16;
+	i = 1;
+	while (nb/=16)
 		i++;
-	}
 	return (i);
 }
 
@@ -21,7 +18,7 @@ char	*itohex(char *base, unsigned long int nb)
 
 	len = hexalen(nb);
 	if(!(str = malloc(sizeof(char) * (len + 1))))
-		return (NULL);
+		return (0);
 	str[len] = '\0';
 	while (len--)
 	{

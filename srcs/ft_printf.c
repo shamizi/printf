@@ -1,182 +1,4 @@
 #include "ft_printf.h"
-#include "libft/libft.h"
-
-int	ft_putchar(char c)
-{
-	write(1, &c, 1);
-	return (1);
-}
-
-
-
-/*teste de fonction pour les flags *chiffre* et -chiffre pour decaler le %c a gauche ou droite;
- */
-
-int		ft_putstr(char *str)
-{
-	int i;
-
-	i = 0;
-	while (str[i])
-	{
-		ft_putchar(str[i]);
-		i++;
-	}
-	return (i);
-}
-
-int		ft_strangelen(char *str)
-{
-	int i;
-
-	i = 0;
-	while (str[i])
-		i++;
-	return (i);
-}
-
-void	display_c(t_ptf *ptf)
-{
-	int i;
-
-	i = 1;
-	if(ptf->neg == 0)
-	{
-		while(i < ptf->width)
-		{
-			ptf->ret += ft_putchar(ptf->space);
-			i++;
-		}
-	}
-	ft_putchar(va_arg(ptf->ap, int));
-	if (ptf->neg == 1)
-	{
-		while (i < ptf->width)
-		{
-			ptf->ret += ft_putchar(' ');
-			i++;
-		}
-	}
-}
-
-void	display_s(t_ptf *ptf)
-{
-	char *str;
-	int i;
-
-	str = (va_arg(ptf->ap, char *));
-	//i = ft_strangelen(str);
-	ptf->width -= ft_strlen_prec(ptf, str);
-	i = 0;
-	if (ptf->neg == 0)
-	{
-		while(i++ < ptf->width)
-			ptf->ret += ft_putchar(ptf->space);
-	}
-
-
-	ft_putstr_prec(ptf, str);
-	//ptf->ret += ft_putstr(str);
-
-
-
-	if (ptf->neg == 1)
-	{
-		while (i++ < ptf->width)
-			ptf->ret += ft_putchar(' ');
-	}
-}
-
-void	display_p(t_ptf *ptf)
-{
-	unsigned long int p;
-	int i;
-
-	i = 0;
-	p = (unsigned long int)va_arg(ptf->ap, void *);
-	hexsize(ptf, p);
-	ptf->width = ptf->width - ptf->hexa - 2;
-	if (ptf->neg == 0)
-	{
-		while (i++ < ptf->width)
-			ptf->ret += ft_putchar(ptf->space);
-	}
-	ptf->ret += ft_putstr("0x");
-	if (!p)
-		ptf->ret += ft_putchar('0');
-	else
-		hexbase(ptf, p);
-	if (ptf->neg == 1)
-	{
-		while (i++ < ptf->width)
-			ft_putchar(' ');
-	}
-}
-
-void	display_x(t_ptf *ptf)
-{
-	int i;
-	unsigned long int x;
-	char *str;
-
-	if (ptf->type == 'X')
-		ft_strlcpy(ptf->base, "0123456789ABCDEF", 17);
-	i = 0;
-	x = (unsigned long int)va_arg(ptf->ap, unsigned int);
-	if(!(str = itohex(ptf->base, x)))
-			return ;
-	if (ptf->prec >= 0 && ptf->prec - hexalen(x) > 0)
-		ptf->prec = ptf->prec - hexalen(x);
-	if (ptf->prec < 0)
-		ptf->width -= hexalen(x);
-	else
-		ptf->width -= (hexalen(x) + ptf->prec);
-	if (ptf->neg == 0)
-	{
-		while (ptf->width-- > 0)
-			ptf->ret += ft_putchar(ptf->space);
-	}
-	ft_hexstr(ptf, str);
-	if(ptf->neg == 1)
-	{
-		while (ptf->width-- > 0)
-			ptf->ret += ft_putchar(' ');
-	}
-}
-
-//si je doit qjouter des 0 le moins est avant les 0, sinon putnbr assez classique avec quelques conditions
-//ajouter une valeur pour determiner la position du moins dans ma structure ?
-//
-void	display_i(t_ptf *ptf)
-{
-	int nb;
-
-	nb = va_arg(ptf->ap, int);
-	if (nb < 0)
-		ptf->width--;
-	if (ptf->prec >= 0)
-		ptf->prec -= integerlen(nb);
-	if (ptf->prec < 0)
-		ptf->width -= integerlen(nb);
-	else
-		ptf->width -= (integerlen(nb) + ptf->prec);
-	//printf(" test valeur width : %d \n test valeur prec : %d \n integern len %d\n", ptf->width, ptf->prec, integerlen(nb));
-	if (ptf->neg == 0)
-	{
-		if (nb < 0 && ptf->space == '0')
-			ptf->ret += ft_putchar('-');
-		while (ptf->width-- > 0)
-			ptf->ret += ft_putchar(ptf->space);
-		if (nb < 0 && ptf->space == ' ')
-			ptf->ret += ft_putchar('-');
-	}
-	ft_nbstr(ptf, nb);
-	if(ptf->neg == 1)
-	{
-		while (ptf->width-- > 0)
-			ptf->ret += ft_putchar(' ');
-	}
-}
 
 void	display_type(t_ptf *ptf)
 {
@@ -193,6 +15,8 @@ void	display_type(t_ptf *ptf)
 		display_i(ptf);
 	if (ptf->type == 'u')
 		display_u(ptf);
+	if (ptf->type == '%')
+		display_percent(ptf);
 }
 
 int		flags(t_ptf *ptf, const char *str)
@@ -245,6 +69,7 @@ void	initialize(t_ptf *ptf)
 int		ft_printf(const char *str, ...)
 {
 	int i;
+	int ret;
 	t_ptf *ptf;
 
 	ptf = malloc(sizeof(*ptf));
@@ -256,31 +81,25 @@ int		ft_printf(const char *str, ...)
 		if (str[i] == '%' && str[i + 1])
 		{
 
-			initialize(ptf);
+			reinitialize(ptf);
 			i += flags(ptf, &str[i + 1]);
 		}
 		else
-			ft_putchar(str[i]);
+			ptf->ret += ft_putchar(str[i]);
 		i++;
 	}
-	return (0);
+	va_end(ptf->ap);
+	ret = ptf->ret;
+	free(ptf);
+	return (ret);
 }
-
+/*
 int		main(void)
 {
-	char c;
-	unsigned int d;
-	char str[50] = "abcdef";
-	void	*p;
-	unsigned int x;
+	int d;
 
-	int star = 12;
-	int star2 = 3;
-
-
-	x = 123456789;
-	c = 's';
-	d = 50;
-	printf("original : %*.*u\n", 12, 3, d);
-	ft_printf("chiffres : %*.*u\n", 12, 3, d);
+	d = 123456789;
+	printf("%d\n", (printf("original : %d, %d, %1.d %10.d, %1.50d", d,d,d,d,d)));
+	printf("%d\n", (ft_printf("chiffres : %d, %d, %1.d %10.d, %1.50d", d,d,d,d,d)));
 }
+*/

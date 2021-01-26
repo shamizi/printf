@@ -1,5 +1,41 @@
 #include "ft_printf.h"
 
+int	ft_isdigit(int c)
+{
+	if (c >= '0' && c <= '9')
+		return (1);
+	else
+		return (0);
+}
+
+int		ft_atoi(const char *str)
+{
+	int i;
+	int res;
+	int neg;
+
+	i = 0;
+	neg = 1;
+	res = 0;
+	while (str[i] == '\t' || str[i] == '\n' || str[i] == '\r' ||
+			str[i] == '\v' || str[i] == '\f' || str[i] == ' ')
+		i++;
+	if (str[i] == '+' || str[i] == '-')
+	{
+		if (str[i] == '-')
+			neg = neg * -1;
+		i++;
+	}
+	while (str[i] >= '0' && str[i] <= '9')
+	{
+		res = res * 10 + str[i] - '0';
+		i++;
+	}
+	res = res * neg;
+	return (res);
+}
+
+
 int		ft_strlen_prec(t_ptf *ptf, char *str)
 {
 	int i;
