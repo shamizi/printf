@@ -99,7 +99,7 @@ int		main(void)
 	int d;
 
 	d = 123456789;
-	printf("%d\n", (printf("original : %d, %d, %1.d %10.d, %1.50d", d,d,d,d,d)));
-	printf("%d\n", (ft_printf("chiffres : %d, %d, %1.d %10.d, %1.50d", d,d,d,d,d)));
+	printf("%d\n", (printf("original : %01.0i\n", 0)));
+	printf("%d\n", (ft_printf("chiffres : %01.0i\n",0)));
 }
 */

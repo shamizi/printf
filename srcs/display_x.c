@@ -11,8 +11,9 @@ void	display_x(t_ptf *ptf)
 	x = (unsigned long int)va_arg(ptf->ap, unsigned int);
 	if (!(str = itohex(ptf->base, x)))
 		return ;
-	if (!x && !ptf->prec && !ptf->width && !ptf->neg)
+	if (!x  && !ptf->prec && !ptf->width /*ptf neg*/)
 		return ;
+	//printf("\n\n x : %lu \n\n prec :%d\n\n width : %d \n\n neg : %d \n\n", x, ptf->prec, ptf->width, ptf->neg);
 	prec = ptf->prec;
 	if (ptf->prec >= 0)
 		ptf->prec -=hexalen(x);
@@ -20,8 +21,9 @@ void	display_x(t_ptf *ptf)
 		ptf->width -= hexalen(x);
 	else
 		ptf->width -= (ptf->prec + hexalen(x));
-	if(ptf->space == '0' && ptf->width > 0 && prec >= 0)
+	if((ptf->space == '0' && ptf->width > 0 && prec >= 0) || (!x && !prec))
 		ptf->space = ' ';
+	//printf("\n\n x : %lu \n\n ptf->prec :%d\n\n width : %d \n\n neg : %d \n\n space : %d \n\n prec : %d \n\n", x, ptf->prec, ptf->width, ptf->neg, ptf->space , prec);
 	if (ptf->neg == 0)
 	{
 		while (ptf->width-- > 0)
@@ -36,4 +38,5 @@ void	display_x(t_ptf *ptf)
 		while (ptf->width-- > 0)
 			ptf->ret += ft_putchar(' ');
 	}
+	free(str);
 }

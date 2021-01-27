@@ -44,26 +44,25 @@ void	display_u(t_ptf *ptf)
 
 	prec = ptf->prec;
 	nb = va_arg(ptf->ap, unsigned int);
+	if (!nb && !ptf->prec && !ptf->width)
+		return ;
 	if (ptf->prec >= 0)
 		ptf->prec -= unsignedintlen(nb);
 	if (ptf->prec < 0)
 		ptf->width -= unsignedintlen(nb);
 	else
 		ptf->width -= (unsignedintlen(nb) + ptf->prec);
-	if (ptf->space == '0' && ptf->width > 0 && prec > 0) 
+	if ((ptf->space == '0' && ptf->width > 0 && prec >= 0) || (!nb && !prec)) 
 		ptf->space = ' ';
-	if (nb == 0 && ptf->width > 0 && prec == 0 && ptf->neg == 0)
-		ptf->width++;
+	/*if (nb == 0 && ptf->width > 0 && prec == 0 && ptf->neg == 0)
+		ptf->width++;*/
 	if (ptf->neg == 0)
 	{
 		while (ptf->width-- > 0)
 			ptf->ret += ft_putchar(ptf->space);
 	}
-	if (nb == 0 && prec == 0)
-	{
-		if (ptf->width > 0)
+	if (!nb && !prec)
 			ptf->ret += ft_putchar(' ');
-	}
 	else
 		ft_nbstr_u(ptf, nb);
 	if (ptf->neg == 1)
